@@ -54,8 +54,8 @@ Through a **Graph-Augmented RAG pipeline**, the system executes **hybrid retriev
 
 ```bash
 # Clone repository
-git clone https://github.com/<your-org>/floatchat-prototype.git
-cd floatchat-prototype
+git clone [(https://github.com/LAKSHYA1509/FloatChat-AI)](https://github.com/LAKSHYA1509/FloatChat-AI).git
+cd FloatChat-AI
 ```
 
 # Install dependencies
