@@ -56,9 +56,19 @@ Through a **Graph-Augmented RAG pipeline**, the system executes **hybrid retriev
 # Clone repository
 git clone https://github.com/<your-org>/floatchat-prototype.git
 cd floatchat-prototype
+```
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Run prototype (example with Streamlit)
 streamlit run ui/app.py
+
+# Some Key things
+Now in GitHub → Branches tab, you’ll see:
+
+main (stable)
+
+dev (integration)
+
+feature/* branches (for each teammate).
