@@ -8,8 +8,15 @@ load_dotenv()
 DB_URL = os.getenv("DATABASE_URL")
 
 def main():
-    ds = xr.open_dataset("data/R2902273_135.nc")
+# ISE MAT CHHEDNA SAALO
+    if __file__.startswith(("R", "D")):
+        print("Not an Argo file. Skipping.")
+        return
 
+    #Multi File Support Add Karna Baaki Hai
+    ds = xr.open_dataset("data/D5901153_260.nc")
+
+    # Check karne ke liye hai ki adjusted variables hain ya nahi
     required_vars = ["PRES_ADJUSTED", "TEMP_ADJUSTED", "PSAL_ADJUSTED"]
     for var in required_vars:
         if var not in ds.variables:
@@ -45,6 +52,7 @@ def main():
 
     profile_id = cur.fetchone()[0]
 
+    # Insert measurements with QC checks
     rows = []
     for i in range(len(pres)):
         if temp_qc[i].decode() == "1" and psal_qc[i].decode() == "1":
