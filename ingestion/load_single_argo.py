@@ -10,7 +10,6 @@ DB_URL = os.getenv("DATABASE_URL")
 def main():
     ds = xr.open_dataset("data/R2902273_135.nc")
 
-    # HARD RULE: skip if adjusted vars missing
     required_vars = ["PRES_ADJUSTED", "TEMP_ADJUSTED", "PSAL_ADJUSTED"]
     for var in required_vars:
         if var not in ds.variables:
