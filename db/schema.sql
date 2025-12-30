@@ -5,7 +5,7 @@ CREATE TABLE argo_profiles (
     profile_datetime TIMESTAMP NOT NULL,
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
-    data_mode CHAR(1) CHECK (data_mode IN ('R', 'D')),
+    data_mode CHAR(1) CHECK (data_mode IN ('R', 'D', 'A')),
     source_file TEXT
 );
 
