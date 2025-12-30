@@ -41,10 +41,8 @@ Through a **Graph-Augmented RAG pipeline**, the system executes **hybrid retriev
 
 | Name        | Core Responsibility       | Technical Focus |
 |-------------|---------------------------|-----------------|
-| **Nandini** | **Frontend** & **Data Extraction** | User Interface (Streamlit/React) + Initial data parsing logic |
-| **Dhairya** | **Data Extraction**       | **NetCDF** parsing using **xarray** |
-| **Lakshya** | **Orchestrator** & **DB Design** | Pipeline coordination + **Schema design** (Vector & Graph DBs) |
-| **Shreya**  | **Data Ingestion**        | Raw → DB pipelines, ensuring format consistency |
+| **Dhairya** | **Data Extraction** & **Frontend**   | **NetCDF** parsing using **xarray** + User Interface (Streamlit/React) |
+| **Lakshya** | **Orchestrator** & **DB Design** | Pipeline coordination + **Schema design** (Vector & Graph DBs) + Raw → DB pipelines, ensuring format consistency |
 | **Pratyush**| **RAG Pipeline**          | **Retrieval-Augmented Generation** design |
 | **Diya**    | **LLM Backend**           | LLM integration, prompt engineering, API management |
 
