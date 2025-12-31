@@ -129,25 +129,20 @@ CREATE TABLE argo_metadata (
 
 #### **Option A: Supabase (Recommended - Already Running)**
 
-Your database is already running on Supabase. Just get the connection details:
+Your database is already running on Supabase using **Transaction Pooler** (recommended for applications).
 
-```bash
-# Go to Supabase Console:
-# 1. Project Settings → Database
-# 2. Find: "Connection string" (PostgreSQL)
-# 3. Copy the full URL
-
-# Example format:
-# postgresql://postgres:[PASSWORD]@db.[SUPABASE_ID].supabase.co:5432/postgres
+Connection string:
+```
+postgresql://postgres.piaxaqdzmksubyxeiskv:TGFAMTUwOTAz@aws-1-ap-south-1.pooler.supabase.com:6543/postgres
 ```
 
 Load the schema:
 ```bash
-# Using the Supabase connection string
-psql "postgresql://postgres:[PASSWORD]@db.[SUPABASE_ID].supabase.co:5432/postgres" < db/schema.sql
+# Using the Transaction Pooler connection string
+psql "postgresql://postgres.piaxaqdzmksubyxeiskv:TGFAMTUwOTAz@aws-1-ap-south-1.pooler.supabase.com:6543/postgres" < db/schema.sql
 
 # Verify tables were created
-psql "postgresql://postgres:[PASSWORD]@db.[SUPABASE_ID].supabase.co:5432/postgres" -c "\dt"
+psql "postgresql://postgres.piaxaqdzmksubyxeiskv:TGFAMTUwOTAz@aws-1-ap-south-1.pooler.supabase.com:6543/postgres" -c "\dt"
 ```
 
 #### **Option B: Local PostgreSQL (For Development Only)**
@@ -164,9 +159,9 @@ psql -h localhost -U postgres -d floatchat -c "\dt"
 
 Create `.env` file in the root directory:
 
-**For Supabase:**
+**For Supabase (Transaction Pooler - Recommended):**
 ```
-DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[SUPABASE_ID].supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres.piaxaqdzmksubyxeiskv:TGFAMTUwOTAz@aws-1-ap-south-1.pooler.supabase.com:6543/postgres
 ```
 
 **For Local PostgreSQL:**
@@ -175,9 +170,10 @@ DATABASE_URL=postgresql://user:password@localhost:5432/floatchat
 ```
 
 ⚠️ **Important for Supabase**: 
-- Replace `[PASSWORD]` with your actual password
-- Replace `[SUPABASE_ID]` with your project ID
-- Get these from: Supabase Console → Project Settings → Database
+- Using Transaction Pooler for optimal connection pooling
+- Connection endpoint: `aws-1-ap-south-1.pooler.supabase.com:6543`
+- This is different from direct connection which uses `db.[SUPABASE_ID].supabase.co:5432`
+- Transaction Pooler is recommended for applications and microservices
 
 ### **Step 3: Run the Data Ingestion Script**
 
@@ -497,10 +493,12 @@ conn = psycopg2.connect(DB_URL, sslmode='require')
 ### **Problem: "authentication failed for user 'postgres'" (Supabase)**
 ```
 Solution:
-1. Go to Supabase Console → Settings → Database
-2. Copy the correct PostgreSQL Connection String
-3. Ensure password is URL-encoded if it contains special characters
-4. Format: postgresql://postgres:PASSWORD@db.PROJECTID.supabase.co:5432/postgres
+1. Go to Supabase Console → Settings → Database → Connection Pooling
+2. Make sure you're using Transaction mode (not Session mode)
+3. Copy the correct PostgreSQL Connection String from the pooler
+4. Format: postgresql://postgres.PROJECTREF:PASSWORD@aws-REGION.pooler.supabase.com:6543/postgres
+5. Ensure password is URL-encoded if it contains special characters
+6. Use port 6543 (not 5432) for the pooler
 ```
 
 ### **Problem: "ModuleNotFoundError: No module named 'xarray'"**
@@ -578,9 +576,9 @@ All documentation is in the `rag/corpus/` directory (used for semantic search):
 
 Create `.env` in project root:
 
-**For Supabase (Cloud Database):**
+**For Supabase (Cloud Database - Transaction Pooler):**
 ```
-DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[SUPABASE_ID].supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres.piaxaqdzmksubyxeiskv:TGFAMTUwOTAz@aws-1-ap-south-1.pooler.supabase.com:6543/postgres
 FAISS_INDEX_PATH=rag/faiss_index/index.bin
 CORPUS_PATH=rag/corpus/
 EMBEDDING_MODEL=all-MiniLM-L6-v2
@@ -598,12 +596,13 @@ API_HOST=0.0.0.0
 API_PORT=8000
 ```
 
-**How to get Supabase credentials:**
+**How to get Supabase Transaction Pooler credentials:**
 1. Go to [Supabase Console](https://supabase.com/dashboard)
 2. Select your project
-3. Settings → Database
-4. Copy the "PostgreSQL Connection String"
-5. Replace `[user]` with `postgres` and `[password]` with your actual password
+3. Settings → Database → Connection Pooling
+4. Select "Transaction mode" (recommended for applications)
+5. Copy the PostgreSQL connection string from the pooler endpoint
+6. This uses a different host (`pooler.supabase.com` instead of `db.supabase.co`) and port `6543` instead of `5432`
 
 ---
 
@@ -616,8 +615,8 @@ API_PORT=8000
 pip install -r requirements.txt
 # (Create requirements.txt with all dependencies above)
 
-# 2. Configure (get connection string from Supabase)
-echo "DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[ID].supabase.co:5432/postgres" > .env
+# 2. Configure (using Transaction Pooler)
+echo "DATABASE_URL=postgresql://postgres.piaxaqdzmksubyxeiskv:TGFAMTUwOTAz@aws-1-ap-south-1.pooler.supabase.com:6543/postgres" > .env
 
 # 3. Create schema (using Supabase connection)
 psql $DATABASE_URL < db/schema.sql

@@ -1,4 +1,4 @@
-![alt text](image.png)
+![alt text](image-1.png)
 
 # Database and File Structure Report
 
