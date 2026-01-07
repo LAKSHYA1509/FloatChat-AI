@@ -47,7 +47,7 @@ Create a `.env` file in the root directory:
 GROQ_API_KEY=gsk_...
 
 # Database Connection (Supabase Transaction Pooler - Port 6543)
-DATABASE_URL=postgresql://postgres.user:password@aws-0-region.pooler.supabase.com:6543/postgres?sslmode=require
+DATABASE_URL=postgresql://postgres.piaxaqdzmksubyxeiskv:TGFAMTUwOTAz@aws-1-ap-south-1.pooler.supabase.com:6543/postgres
 ```
 
 ### 3. Build Knowledge Index
