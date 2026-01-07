@@ -12,7 +12,7 @@ def main():
     if not os.getenv("OPENROUTER_API_KEY") and not os.getenv("GROQ_API_KEY"):
         print("WARNING: No API keys found in .env. Please add OPENROUTER_API_KEY or GROQ_API_KEY.")
     
-    #question = "What is the average adjusted temperature where pressure is more than 20 dbar?"
+    #question = "What is the average temperature where pressure is more than 20 dbar?"
     question = "How many Profiles are there and what are their profile numbers?"
     print(f"\nUser Question: {question}")
     
@@ -43,3 +43,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
