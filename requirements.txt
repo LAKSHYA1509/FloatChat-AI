@@ -1,0 +1,15 @@
+langgraph
+langchain
+langchain_core
+langchain_openai
+langchain_groq
+pandas
+tabulate
+python-dotenv
+requests
+psycopg2-binary
+sentence-transformers
+faiss-cpu
+fastapi
+uvicorn
+streamlit
