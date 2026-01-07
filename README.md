@@ -24,7 +24,7 @@ Cloning and setting up the virtual environment:
 
 ```bash
 # Clone the repository (if you haven't)
-# git clone <repo_url>
+git clone <repo_url>
 
 # Create Virtual Environment
 python -m venv venv
@@ -33,7 +33,7 @@ python -m venv venv
 .\venv\Scripts\activate
 
 # Activate (Mac/Linux)
-# source venv/bin/activate
+source venv/bin/activate
 
 # Install Dependencies
 pip install -r requirements.txt
