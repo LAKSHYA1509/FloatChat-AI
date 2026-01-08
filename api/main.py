@@ -1,28 +1,70 @@
-import os
-import psycopg2
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import List, Optional, Dict, Any
+from rag.graph import app as rag_graph
+import uvicorn
+import os
+import psycopg2
 from dotenv import load_dotenv
 
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Data Testing ke liye API banayi hai Taaki SQL Queries run kar sakein
-app = FastAPI(title="testing-api")
+app = FastAPI(title="FloatChat RAG API")
 
+class QueryRequest(BaseModel):
+    question: str
+
+class QueryResponse(BaseModel):
+    summary: str
+    sql_query: Optional[str] = None
+    data: Optional[List[Dict[str, Any]]] = None
+    validation_error: Optional[str] = None
 
 class SQLQuery(BaseModel):
     sql: str
 
+@app.get("/")
+def health_check():
+    return {"status": "ok", "service": "FloatChat RAG"}
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+@app.post("/query", response_model=QueryResponse)
+async def run_query(request: QueryRequest):
+    """
+    Executes the RAG pipeline for a given question.
+    """
+    try:
+        initial_state = {
+            "question": request.question,
+            "retry_count": 0
+        }
+
+        # Invoke the graph (run to completion)
+        final_state = await rag_graph.ainvoke(initial_state)
+
+        return QueryResponse(
+            summary=final_state.get("summary", "No summary generated."),
+            sql_query=final_state.get("sql_query"),
+            data=final_state.get("query_result"),
+            validation_error=final_state.get("validation_error")
+        )
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/query/sql")
 def run_sql(query: SQLQuery):
+    """
+    Direct SQL execution endpoint (from Lakshya's branch).
+    Useful for testing and raw queries.
+    """
     sql = query.sql.strip()
 
     if not sql.lower().startswith("select"):
@@ -46,3 +88,7 @@ def run_sql(query: SQLQuery):
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+if __name__ == "__main__":
+    port = int(os.getenv("API_PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
