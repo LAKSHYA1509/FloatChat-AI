@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from rag.graph import app as rag_graph
@@ -18,6 +19,19 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 app = FastAPI(title="FloatChat RAG API")
+
+# ── CORS — allow the React dev server (and any future domain) ──
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",   # Vite dev server
+        "http://localhost:3000",   # fallback CRA port
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class QueryRequest(BaseModel):
     question: str
