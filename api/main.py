@@ -1,3 +1,9 @@
+import sys
+from pathlib import Path
+
+# Add the parent directory to the path to allow imports from sibling packages
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
