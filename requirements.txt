@@ -13,3 +13,8 @@ faiss-cpu
 fastapi
 uvicorn
 streamlit
+# Blockchain
+web3
+# # Rate Limiting (Redis branch)
+# slowapi
+# redis

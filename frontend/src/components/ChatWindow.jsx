@@ -79,6 +79,7 @@ export default function ChatWindow({
                 content,
                 sql_generated: extra.sql_generated ?? null,
                 tx_hash: extra.tx_hash ?? null,
+                audit_hash: extra.audit_hash ?? null,
             }])
             .select()
             .single()
@@ -121,17 +122,20 @@ export default function ChatWindow({
             }
 
             const result = await response.json()
-            // result = { summary, sql_query, data, validation_error }
+            // result = { summary, sql_query, data, validation_error, tx_hash, audit_hash, polygonscan_url }
 
             const answerText = result.validation_error
                 ? `⚠️ ${result.validation_error}\n\n${result.summary ?? ''}`
                 : result.summary ?? 'No answer generated.'
 
-            // 4. Save + display assistant message (with SQL + TX hash)
+            // 4. Save + display assistant message (with SQL + blockchain audit)
             const aiMsg = await saveMessage(convId, 'assistant', answerText, {
                 sql_generated: result.sql_query ?? null,
                 tx_hash: result.tx_hash ?? null,
+                audit_hash: result.audit_hash ?? null,
             })
+            // Attach polygonscan_url in memory (not persisted — reconstructed from tx_hash if needed)
+            aiMsg._polygonscanUrl = result.polygonscan_url ?? null
             setMessages(prev => [...prev, aiMsg])
             setBackendOnline(true) // explicit: backend clearly alive
 
@@ -330,6 +334,11 @@ export default function ChatWindow({
                         content={msg.content}
                         sqlGenerated={msg.sql_generated}
                         txHash={msg.tx_hash}
+                        auditHash={msg.audit_hash}
+                        polygonscanUrl={
+                            msg._polygonscanUrl ??
+                            (msg.tx_hash ? `https://amoy.polygonscan.com/tx/${msg.tx_hash}` : null)
+                        }
                         createdAt={msg.created_at}
                     />
                 ))}

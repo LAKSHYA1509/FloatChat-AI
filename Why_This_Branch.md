@@ -1,8 +1,4 @@
-This branch is only responsible for two things:-
-1. React Frontend
-2. Login System
-3. Cleanest UI with glass like gemini style and animations(What can FloatChat do? and how to gain uses. Chat histories etc.).
-
-4. Use Supabase Auth for login and registration. No touch of RAG system as of now as it is handled by different department.
-
-5. Ideas for chat history
+This branch is only responsible for specific things mentioned:-
+1. BlockChain Integration as per the Non-Neg File.
+2. Usage of slowapi to implement Rate Limiting
+3. Testing tools to check high volume of users and stress testing.

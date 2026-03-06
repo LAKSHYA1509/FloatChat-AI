@@ -74,23 +74,187 @@ function SqlBlock({ sql }) {
     )
 }
 
-/* ── TX Hash Badge ───────────────────────────────────────────── */
-function TxBadge({ txHash }) {
-    const short = `${txHash.slice(0, 6)}…${txHash.slice(-4)}`
-    const link = `https://mumbai.polygonscan.com/tx/${txHash}`
+/* ── TX Hash Badge (Polygon Amoy) ───────────────────────────── */
+function TxBadge({ txHash, auditHash, polygonscanUrl }) {
+    const [expanded, setExpanded] = useState(false)
+    const [copied, setCopied] = useState(null) // 'tx' | 'audit' | null
+
+    const short = `${txHash.slice(0, 10)}…${txHash.slice(-8)}`
+    const link = polygonscanUrl ?? `https://amoy.polygonscan.com/tx/${txHash}`
+
+    const copyToClipboard = (text, key) => {
+        navigator.clipboard.writeText(text).then(() => {
+            setCopied(key)
+            setTimeout(() => setCopied(null), 2000)
+        })
+    }
+
     return (
-        <a href={link} target="_blank" rel="noopener noreferrer"
-            style={{ textDecoration: 'none', display: 'inline-flex', marginTop: 8 }}
-        >
-            <span className="badge badge-purple">
-                ⛓ Verified on-chain · {short}
-            </span>
-        </a>
+        <div className="animate-slide-in-up" style={{
+            marginTop: 12,
+            borderRadius: 12,
+            border: '1px solid rgba(167,139,250,0.25)',
+            background: 'linear-gradient(135deg, rgba(139,92,246,0.07), rgba(59,130,246,0.07))',
+            overflow: 'hidden',
+        }}>
+            {/* ── Header row ── */}
+            <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '8px 12px', gap: 8,
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                    {/* animated chain icon */}
+                    <span style={{
+                        fontSize: '0.85rem',
+                        animation: 'pulse-glow 2.5s ease infinite',
+                        display: 'inline-block',
+                    }}>⛓️</span>
+                    <span style={{
+                        fontSize: '0.72rem', fontWeight: 700,
+                        color: '#a78bfa', letterSpacing: '0.04em',
+                        textTransform: 'uppercase',
+                    }}>
+                        On-Chain Verified
+                    </span>
+                    {/* live green dot */}
+                    <span style={{
+                        width: 6, height: 6, borderRadius: '50%',
+                        background: '#4ade80',
+                        boxShadow: '0 0 6px #4ade80',
+                        display: 'inline-block',
+                        animation: 'pulse-glow 2s ease infinite',
+                    }} />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {/* PolygonScan link */}
+                    <a href={link} target="_blank" rel="noopener noreferrer" style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                        fontSize: '0.7rem', fontWeight: 600, color: '#818cf8',
+                        textDecoration: 'none', padding: '3px 9px',
+                        borderRadius: 99, border: '1px solid rgba(129,140,248,0.25)',
+                        background: 'rgba(129,140,248,0.08)',
+                        transition: 'all 0.18s ease',
+                    }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(129,140,248,0.18)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(129,140,248,0.08)'}
+                    >
+                        View on PolygonScan ↗
+                    </a>
+                    {/* expand toggle */}
+                    <button onClick={() => setExpanded(v => !v)} style={{
+                        background: 'transparent', border: 'none',
+                        color: 'var(--text-muted)', cursor: 'pointer',
+                        fontSize: '0.75rem', padding: '2px 6px',
+                        transition: 'color 0.15s',
+                    }}
+                        onMouseEnter={e => e.currentTarget.style.color = '#a78bfa'}
+                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                        title={expanded ? 'Collapse' : 'Show full hashes'}
+                    >
+                        {expanded ? '▴' : '▾'}
+                    </button>
+                </div>
+            </div>
+
+            {/* ── TX hash short pill ── */}
+            <div style={{
+                padding: '0 12px 8px',
+                display: 'flex', alignItems: 'center', gap: 6,
+            }}>
+                <code style={{
+                    fontSize: '0.72rem', color: '#c4b5fd',
+                    fontFamily: 'var(--font-mono)',
+                    background: 'rgba(139,92,246,0.1)',
+                    padding: '2px 8px', borderRadius: 6,
+                    letterSpacing: '0.03em',
+                }}>
+                    TX: {short}
+                </code>
+                <button
+                    onClick={() => copyToClipboard(txHash, 'tx')}
+                    title="Copy TX hash"
+                    style={{
+                        background: 'transparent', border: 'none',
+                        cursor: 'pointer', fontSize: '0.75rem',
+                        color: copied === 'tx' ? '#4ade80' : 'var(--text-muted)',
+                        transition: 'color 0.2s', padding: '2px 4px',
+                    }}
+                >
+                    {copied === 'tx' ? '✓' : '⧉'}
+                </button>
+            </div>
+
+            {/* ── Expanded: show full hashes ── */}
+            {expanded && (
+                <div className="animate-slide-in-up" style={{
+                    borderTop: '1px solid rgba(167,139,250,0.15)',
+                    padding: '10px 12px',
+                    display: 'flex', flexDirection: 'column', gap: 8,
+                }}>
+                    {/* Full TX Hash */}
+                    <div>
+                        <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: 3, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            Transaction Hash
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <code style={{
+                                fontSize: '0.68rem', color: '#c4b5fd',
+                                fontFamily: 'var(--font-mono)',
+                                wordBreak: 'break-all', lineHeight: 1.5,
+                            }}>
+                                {txHash}
+                            </code>
+                            <button onClick={() => copyToClipboard(txHash, 'tx-full')} style={{
+                                background: 'transparent', border: 'none', cursor: 'pointer',
+                                fontSize: '0.75rem', flexShrink: 0,
+                                color: copied === 'tx-full' ? '#4ade80' : 'var(--text-muted)',
+                                transition: 'color 0.2s',
+                            }}>
+                                {copied === 'tx-full' ? '✓' : '⧉'}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Audit Hash */}
+                    {auditHash && (
+                        <div>
+                            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: 3, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                Audit Hash (SHA-256 · reproducible)
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                <code style={{
+                                    fontSize: '0.68rem', color: '#93c5fd',
+                                    fontFamily: 'var(--font-mono)',
+                                    wordBreak: 'break-all', lineHeight: 1.5,
+                                }}>
+                                    {auditHash}
+                                </code>
+                                <button onClick={() => copyToClipboard(auditHash, 'audit')} style={{
+                                    background: 'transparent', border: 'none', cursor: 'pointer',
+                                    fontSize: '0.75rem', flexShrink: 0,
+                                    color: copied === 'audit' ? '#4ade80' : 'var(--text-muted)',
+                                    transition: 'color 0.2s',
+                                }}>
+                                    {copied === 'audit' ? '✓' : '⧉'}
+                                </button>
+                            </div>
+                            <p style={{
+                                fontSize: '0.63rem', color: 'var(--text-muted)',
+                                marginTop: 4, fontStyle: 'italic',
+                            }}>
+                                SHA256(question + SQL + results) — independently reproducible by any researcher
+                            </p>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
     )
 }
 
 /* ── Main MessageBubble ──────────────────────────────────────── */
-export default function MessageBubble({ role, content, sqlGenerated, txHash, createdAt }) {
+export default function MessageBubble({ role, content, sqlGenerated, txHash, auditHash, polygonscanUrl, createdAt }) {
     const isUser = role === 'user'
 
     return (
@@ -141,7 +305,13 @@ export default function MessageBubble({ role, content, sqlGenerated, txHash, cre
                     {!isUser && sqlGenerated && <SqlBlock sql={sqlGenerated} />}
 
                     {/* Blockchain TX badge */}
-                    {!isUser && txHash && <TxBadge txHash={txHash} />}
+                    {!isUser && txHash && (
+                        <TxBadge
+                            txHash={txHash}
+                            auditHash={auditHash}
+                            polygonscanUrl={polygonscanUrl}
+                        />
+                    )}
                 </div>
 
                 {/* Timestamp */}
