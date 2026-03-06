@@ -133,6 +133,7 @@ export default function ChatWindow({
                 tx_hash: result.tx_hash ?? null,
             })
             setMessages(prev => [...prev, aiMsg])
+            setBackendOnline(true) // explicit: backend clearly alive
 
         } catch (err) {
             const isOffline = err.message === 'Failed to fetch' || err.name === 'TypeError'
@@ -147,6 +148,24 @@ export default function ChatWindow({
             setIsLoading(false)
         }
     }
+
+    /* ── Auto-ping backend when offline (recovers automatically) ─ */
+    useEffect(() => {
+        if (backendOnline) return
+        const ping = async () => {
+            try {
+                const r = await fetch(`${API_BASE}/health`, { method: 'GET' })
+                if (r.ok) {
+                    setBackendOnline(true)
+                    setError(null)
+                }
+            } catch {
+                // still offline — keep trying
+            }
+        }
+        const id = setInterval(ping, 5000)
+        return () => clearInterval(id)
+    }, [backendOnline])
 
     /* ── Enter key to send ─────────────────────────────────────── */
     const handleKeyDown = (e) => {
@@ -203,19 +222,46 @@ export default function ChatWindow({
                     background: 'rgba(244,63,94,0.07)',
                     borderBottom: '1px solid rgba(244,63,94,0.15)',
                     padding: '10px 28px',
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    flexShrink: 0, gap: 12, flexWrap: 'wrap',
                 }}>
-                    <span style={{ fontSize: '0.8rem', color: '#fb7185' }}>
-                        ⚠️ Python backend not running.
-                    </span>
-                    <code style={{
-                        fontSize: '0.75rem', color: '#7dd3fc',
-                        background: 'rgba(0,0,0,0.3)', padding: '2px 10px',
-                        borderRadius: 6, fontFamily: 'var(--font-mono)',
-                    }}>
-                        python -m uvicorn api.main:app --reload --port 8000
-                    </code>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '0.8rem', color: '#fb7185' }}>
+                            ⚠️ Python backend not running.
+                        </span>
+                        <code style={{
+                            fontSize: '0.75rem', color: '#7dd3fc',
+                            background: 'rgba(0,0,0,0.3)', padding: '2px 10px',
+                            borderRadius: 6, fontFamily: 'var(--font-mono)',
+                        }}>
+                            python -m uvicorn api.main:app --reload --port 8000
+                        </code>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                            Auto-reconnecting every 5s...
+                        </span>
+                        <button
+                            onClick={async () => {
+                                try {
+                                    const r = await fetch(`${API_BASE}/health`)
+                                    if (r.ok) { setBackendOnline(true); setError(null) }
+                                } catch { /* still offline */ }
+                            }}
+                            style={{
+                                padding: '4px 14px', borderRadius: 8, cursor: 'pointer',
+                                background: 'rgba(244,63,94,0.12)',
+                                border: '1px solid rgba(244,63,94,0.25)',
+                                color: '#fb7185', fontSize: '0.75rem', fontWeight: 600,
+                                fontFamily: 'var(--font-sans)',
+                                transition: 'all 0.15s ease',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,63,94,0.22)' }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(244,63,94,0.12)' }}
+                        >
+                            Retry now
+                        </button>
+                    </div>
                 </div>
             )}
 
