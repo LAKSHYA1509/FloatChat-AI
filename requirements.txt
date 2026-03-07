@@ -12,6 +12,7 @@ sentence-transformers
 faiss-cpu
 fastapi
 uvicorn
+apscheduler
 streamlit
 # Blockchain
 web3
