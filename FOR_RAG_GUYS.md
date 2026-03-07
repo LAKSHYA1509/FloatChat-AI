@@ -559,5 +559,4 @@ That's the full contract. Everything else — DB, ingestion, blockchain — is a
 
 ---
 
-*Questions? Ping Lakshya. He set all of this up and knows every line.*  
-*— Team Argonauts 🌊*
+*— Team Wavesena 🌊*
