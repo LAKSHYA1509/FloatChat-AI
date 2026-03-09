@@ -6,6 +6,7 @@ import FeaturesSection from "@/components/landing/FeaturesSection";
 import Footer from "@/components/landing/Footer";
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorks from "@/components/landing/HowItWorks";
+import LaunchPopup from "@/components/landing/LaunchPopup";
 import Navbar from "@/components/landing/Navbar";
 import ParticleField from "@/components/landing/ParticleField";
 import ResearchShowcase from "@/components/landing/ResearchShowcase";
@@ -43,6 +44,7 @@ const Index = () => {
       <Divider />
       <CtaSection />
       <Footer />
+      <LaunchPopup />
     </div>
   );
 };
