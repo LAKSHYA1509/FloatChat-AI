@@ -1,137 +1,70 @@
-/* ============================================================
-   OceanLoader — Full-screen animated ocean loading screen
-   Used during auth checks and page transitions
-   ============================================================ */
-
-const waveStyle = (delay, opacity, speed) => ({
-    position: 'absolute',
-    bottom: 0,
-    left: '-50%',
-    width: '200%',
-    height: '160px',
-    background: 'linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%)',
-    borderRadius: '43% 57% 52% 48% / 30% 30% 70% 70%',
-    opacity,
-    animation: `ocean-wave ${speed}s ease-in-out ${delay}s infinite alternate`,
-    transformOrigin: '50% 100%',
-})
-
 export default function OceanLoader({ message = 'Charting your course…' }) {
     return (
-        <div style={{
-            position: 'fixed', inset: 0, zIndex: 9999,
-            background: 'var(--bg-root)',
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            overflow: 'hidden',
-            fontFamily: 'var(--font-sans)',
-        }}>
+        <div className="fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center overflow-hidden">
 
-            {/* ── Ambient glow orbs ────────────────────────────────── */}
-            <div style={{
-                position: 'absolute', width: 500, height: 500, borderRadius: '50%',
-                top: '-20%', left: '-10%',
-                background: 'radial-gradient(circle, rgba(34,211,238,0.06) 0%, transparent 70%)',
-                animation: 'orb-drift-1 18s ease-in-out infinite',
-                pointerEvents: 'none',
-            }} />
-            <div style={{
-                position: 'absolute', width: 400, height: 400, borderRadius: '50%',
-                bottom: '-10%', right: '-8%',
-                background: 'radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%)',
-                animation: 'orb-drift-2 22s ease-in-out infinite',
-                pointerEvents: 'none',
-            }} />
+            {/* Ambient orbs */}
+            <div className="absolute w-[500px] h-[500px] rounded-full -top-1/5 -left-[10%] pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.06) 0%, transparent 70%)', animation: 'orb-drift-1 18s ease-in-out infinite' }} />
+            <div className="absolute w-[400px] h-[400px] rounded-full -bottom-[10%] -right-[8%] pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%)', animation: 'orb-drift-2 22s ease-in-out infinite' }} />
 
-            {/* ── Main content ─────────────────────────────────────── */}
-            <div style={{
-                position: 'relative', zIndex: 2,
-                display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: 28,
-                marginBottom: 120, // offset for wave panel below
-            }}>
-
-                {/* Floating boat */}
-                <div style={{
-                    fontSize: '3.4rem',
-                    animation: 'float 3s ease-in-out infinite',
-                    filter: 'drop-shadow(0 0 20px rgba(34,211,238,0.5))',
-                }}>
+            {/* Content */}
+            <div className="relative z-10 flex flex-col items-center gap-7 mb-28">
+                <div className="text-[3.5rem] animate-float drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]">
                     🚢
                 </div>
 
-                {/* Brand */}
-                <div style={{ textAlign: 'center' }}>
-                    <h1 style={{
-                        fontSize: '2rem', fontWeight: 800,
-                        letterSpacing: '-0.03em',
-                        background: 'linear-gradient(135deg, #22d3ee, #3b82f6, #8b5cf6)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                        backgroundSize: '200% auto',
-                        animation: 'shimmer-text 2.5s linear infinite',
-                        marginBottom: 8,
-                    }}>
+                <div className="text-center">
+                    <h1 className="text-[2rem] font-extrabold tracking-tight text-gradient-primary mb-2"
+                        style={{ backgroundSize: '200% auto', animation: 'shimmer 2.5s linear infinite' }}>
                         FloatChat
                     </h1>
-                    <p style={{
-                        fontSize: '0.88rem',
-                        color: 'var(--text-muted)',
-                        letterSpacing: '0.04em',
-                    }}>
-                        {message}
-                    </p>
+                    <p className="text-[0.85rem] text-muted-foreground/60 tracking-wide">{message}</p>
                 </div>
 
-                {/* Animated dots */}
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                {/* Dots */}
+                <div className="flex gap-2 items-center">
                     {[0, 1, 2, 3, 4].map(i => (
                         <div
                             key={i}
-                            style={{
-                                width: i === 2 ? 10 : 7,
-                                height: i === 2 ? 10 : 7,
-                                borderRadius: '50%',
-                                background: i === 2 ? 'var(--cyan)' : 'rgba(34,211,238,0.35)',
-                                animation: `typing-dot 1.4s ease-in-out ${i * 0.15}s infinite`,
-                                boxShadow: i === 2 ? '0 0 10px rgba(34,211,238,0.6)' : 'none',
-                            }}
+                            className={`rounded-full ${i === 2 ? 'w-2.5 h-2.5 bg-primary shadow-[0_0_10px_hsla(193,100%,50%,0.6)]' : 'w-1.5 h-1.5 bg-primary/35'}`}
+                            style={{ animation: `typing-dot 1.4s ease-in-out ${i * 0.15}s infinite` }}
                         />
                     ))}
                 </div>
             </div>
 
-            {/* ── Wave panel at bottom ──────────────────────────────── */}
-            <div style={{
-                position: 'absolute', bottom: 0, left: 0, right: 0,
-                height: 220, overflow: 'hidden',
-            }}>
-                {/* Wave 3 — back */}
-                <div style={waveStyle(0.4, 0.06, 5)} />
-                {/* Wave 2 — middle */}
-                <div style={waveStyle(0, 0.10, 6.5)} />
-                {/* Wave 1 — front */}
-                <div style={{ ...waveStyle(0.8, 0.18, 4), background: 'linear-gradient(135deg, #0ea5e9, #6366f1)' }} />
-
-                {/* Foam line */}
+            {/* Wave panel */}
+            <div className="absolute bottom-0 left-0 right-0 h-[220px] overflow-hidden">
+                {[
+                    { delay: '0.4s', opacity: 0.06, dur: '5s' },
+                    { delay: '0s', opacity: 0.10, dur: '6.5s' },
+                    { delay: '0.8s', opacity: 0.18, dur: '4s', alt: true },
+                ].map((w, i) => (
+                    <div key={i} style={{
+                        position: 'absolute', bottom: 0, left: '-50%', width: '200%', height: 160,
+                        background: w.alt
+                            ? 'linear-gradient(135deg, #0ea5e9, #6366f1)'
+                            : 'linear-gradient(135deg, hsl(193,100%,50%), #3b82f6)',
+                        borderRadius: '43% 57% 52% 48% / 30% 30% 70% 70%',
+                        opacity: w.opacity,
+                        transformOrigin: '50% 100%',
+                        animation: `ocean-wave ${w.dur} ease-in-out ${w.delay} infinite alternate`,
+                    }} />
+                ))}
                 <div style={{
-                    position: 'absolute', bottom: 0, left: 0, right: 0,
-                    height: 70,
+                    position: 'absolute', bottom: 0, left: 0, right: 0, height: 70,
                     background: 'linear-gradient(to bottom, transparent, rgba(14,165,233,0.08))',
                 }} />
             </div>
 
-            {/* ── Keyframes ─────────────────────────────────────────── */}
             <style>{`
-        @keyframes ocean-wave {
-          0%   { transform: translateX(0) scaleY(1) rotate(0deg); }
-          50%  { transform: translateX(-8%) scaleY(1.12) rotate(1deg); }
-          100% { transform: translateX(-4%) scaleY(0.94) rotate(-1deg); }
-        }
-        @keyframes shimmer-text {
-          0%   { background-position: 0% center; }
-          100% { background-position: 200% center; }
-        }
-      `}</style>
+                @keyframes ocean-wave {
+                    0%   { transform: translateX(0) scaleY(1) rotate(0deg); }
+                    50%  { transform: translateX(-8%) scaleY(1.12) rotate(1deg); }
+                    100% { transform: translateX(-4%) scaleY(0.94) rotate(-1deg); }
+                }
+            `}</style>
         </div>
     )
 }

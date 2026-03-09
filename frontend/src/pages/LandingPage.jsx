@@ -115,7 +115,7 @@ export default function LandingPage() {
 
                 {/* Headline */}
                 <h1 className="animate-fade-in" style={{
-                    fontSize: 'clamp(2.6rem, 6vw, 4.5rem)',
+                    fontSize: 'clamp(2.6rem, 6vw, 4.5rem)', 
                     fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1,
                     animationDelay: '0.1s',
                 }}>

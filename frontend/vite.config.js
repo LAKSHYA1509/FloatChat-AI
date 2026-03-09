@@ -1,11 +1,17 @@
 import react from '@vitejs/plugin-react'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
   server: {
     proxy: {
-      // /api/* in dev → FastAPI at localhost:8000
+      // /api/* in dev → FastAPI at localhost:8000 (UNTOUCHED)
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,

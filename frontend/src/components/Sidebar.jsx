@@ -7,9 +7,7 @@ import { supabase } from '../lib/supabase'
 function groupByDate(conversations) {
     const today = new Date()
     const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1)
-
     const fmt = d => d.toDateString()
-
     const groups = { Today: [], Yesterday: [], Older: [] }
     conversations.forEach(c => {
         const d = new Date(c.updated_at)
@@ -20,48 +18,34 @@ function groupByDate(conversations) {
     return groups
 }
 
-/* ── Single conversation item ────────────────────────────────── */
+/* ── Conversation item ───────────────────────────────────────── */
 function ConvItem({ conv, isActive, onClick, onDelete }) {
     const [hover, setHover] = useState(false)
-    const [menuVisible, setMenuVisible] = useState(false)
 
     return (
         <div
             onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => { setHover(false); setMenuVisible(false) }}
+            onMouseLeave={() => setHover(false)}
             onClick={onClick}
-            style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '9px 12px', borderRadius: 10, cursor: 'pointer',
-                background: isActive
-                    ? 'rgba(34,211,238,0.10)'
-                    : hover ? 'var(--glass-bg-hover)' : 'transparent',
-                border: isActive ? '1px solid rgba(34,211,238,0.20)' : '1px solid transparent',
-                transition: 'all 0.18s ease',
-                marginBottom: 2,
-            }}
+            className={`
+                group flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer mb-1
+                transition-all duration-150
+                ${isActive
+                    ? 'bg-primary/10 border border-primary/20'
+                    : 'border border-transparent hover:bg-white/[0.05] hover:border-white/[0.08]'}
+            `}
         >
-            <span style={{
-                fontSize: '0.83rem', color: isActive ? 'var(--cyan)' : 'var(--text-secondary)',
-                fontWeight: isActive ? 600 : 400,
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                flex: 1,
-            }}>
+            <span className={`
+                text-[0.82rem] truncate flex-1 leading-snug
+                ${isActive ? 'text-primary font-semibold' : 'text-muted-foreground font-normal'}
+            `}>
                 💬 {conv.title}
             </span>
 
-            {/* Delete button on hover */}
             {hover && (
                 <button
                     onClick={e => { e.stopPropagation(); onDelete(conv.id) }}
-                    style={{
-                        background: 'transparent', border: 'none',
-                        color: 'var(--text-muted)', cursor: 'pointer',
-                        padding: '2px 6px', borderRadius: 6, fontSize: '0.8rem',
-                        flexShrink: 0, transition: 'color 0.15s ease',
-                    }}
-                    onMouseEnter={e => e.target.style.color = '#f43f5e'}
-                    onMouseLeave={e => e.target.style.color = 'var(--text-muted)'}
+                    className="ml-2 text-[0.75rem] text-muted-foreground/50 hover:text-destructive transition-colors shrink-0 px-1"
                 >
                     ✕
                 </button>
@@ -70,7 +54,7 @@ function ConvItem({ conv, isActive, onClick, onDelete }) {
     )
 }
 
-/* ── Main Sidebar ────────────────────────────────────────────── */
+/* ── Main Sidebar ─────────────────────────────────────────────── */
 export default function Sidebar({
     username,
     conversations, setConversations,
@@ -80,118 +64,70 @@ export default function Sidebar({
     const { user, signOut } = useAuth()
     const navigate = useNavigate()
 
-    /* Load conversations on mount */
-    useEffect(() => {
-        fetchConversations()
-    }, [])
+    useEffect(() => { fetchConversations() }, [])
 
     const fetchConversations = async () => {
         const { data, error } = await supabase
-            .from('conversations')
-            .select('*')
+            .from('conversations').select('*')
             .order('updated_at', { ascending: false })
-
         if (!error && data) setConversations(data)
     }
 
-    /* Delete a conversation */
     const handleDelete = async (id) => {
         await supabase.from('conversations').delete().eq('id', id)
         setConversations(prev => prev.filter(c => c.id !== id))
-        if (activeConvId === id) {
-            setActiveConvId(null)
-            onNewChat()
-        }
+        if (activeConvId === id) { setActiveConvId(null); onNewChat() }
     }
 
-    /* Sign out */
-    const handleSignOut = async () => {
-        await signOut()
-        navigate('/')
-    }
+    const handleSignOut = async () => { await signOut(); navigate('/') }
 
     const groups = groupByDate(conversations)
 
     return (
-        <aside style={{
-            width: 'var(--sidebar-width)', flexShrink: 0,
-            height: '100vh', display: 'flex', flexDirection: 'column',
-            background: 'var(--bg-surface)',
-            borderRight: '1px solid var(--glass-border)',
-        }}>
-
-            {/* ── Logo ─────────────────────────────────────────────── */}
-            <div style={{
-                padding: '20px 16px 16px',
-                borderBottom: '1px solid var(--glass-border)',
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                    <div style={{
-                        width: 34, height: 34, borderRadius: 10,
-                        background: 'linear-gradient(135deg, #22d3ee, #3b82f6)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '1rem', boxShadow: '0 0 16px rgba(34,211,238,0.3)',
-                    }}>
+        <aside className="
+            w-[268px] shrink-0 h-screen flex flex-col
+            bg-[hsl(218,78%,8%)]
+            border-r border-border
+        ">
+            {/* ── Logo ────────────────────────────────────────── */}
+            <div className="px-4 pt-5 pb-4 border-b border-border">
+                <div className="flex items-center gap-2.5 mb-4">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-sm shadow-[0_0_16px_hsla(193,100%,50%,0.3)]">
                         🌊
                     </div>
-                    <span style={{
-                        fontSize: '1.05rem', fontWeight: 700,
-                        background: 'linear-gradient(135deg, #22d3ee, #3b82f6)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    }}>
+                    <span className="text-[1rem] font-extrabold text-gradient-primary">
                         FloatChat
                     </span>
                 </div>
 
-                {/* New Chat */}
+                {/* New chat button */}
                 <button
                     id="btn-new-chat"
                     onClick={onNewChat}
-                    style={{
-                        width: '100%', padding: '10px 14px',
-                        background: 'var(--glass-bg)',
-                        border: '1px solid var(--glass-border)',
-                        color: 'var(--text-secondary)',
-                        borderRadius: 10, cursor: 'pointer',
-                        fontSize: '0.85rem', fontWeight: 500,
-                        display: 'flex', alignItems: 'center', gap: 8,
-                        transition: 'all 0.2s ease',
-                    }}
-                    onMouseEnter={e => {
-                        e.currentTarget.style.background = 'var(--glass-bg-hover)'
-                        e.currentTarget.style.borderColor = 'var(--glass-border-hover)'
-                        e.currentTarget.style.color = 'var(--text-primary)'
-                    }}
-                    onMouseLeave={e => {
-                        e.currentTarget.style.background = 'var(--glass-bg)'
-                        e.currentTarget.style.borderColor = 'var(--glass-border)'
-                        e.currentTarget.style.color = 'var(--text-secondary)'
-                    }}
+                    className="
+                        w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl
+                        text-[0.83rem] font-medium text-muted-foreground
+                        border border-border
+                        hover:bg-white/[0.05] hover:border-white/[0.12] hover:text-foreground
+                        transition-all duration-200
+                    "
                 >
-                    <span style={{ fontWeight: 700, fontSize: '1rem' }}>+</span>
+                    <span className="text-primary font-bold text-base leading-none">+</span>
                     New conversation
                 </button>
             </div>
 
-            {/* ── History list ───────────────────────────────────────── */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '12px 10px' }}>
+            {/* ── History ─────────────────────────────────────── */}
+            <div className="flex-1 overflow-y-auto px-2.5 py-3 scrollbar-thin scrollbar-thumb-white/10">
                 {conversations.length === 0 ? (
-                    <p style={{
-                        fontSize: '0.8rem', color: 'var(--text-muted)',
-                        textAlign: 'center', marginTop: 32, lineHeight: 1.6,
-                    }}>
+                    <p className="text-center text-muted-foreground/50 text-[0.78rem] mt-10 leading-relaxed">
                         No chats yet.<br />Ask the ocean something 🌊
                     </p>
                 ) : (
                     Object.entries(groups).map(([label, convs]) =>
                         convs.length > 0 && (
-                            <div key={label} style={{ marginBottom: 18 }}>
-                                <p style={{
-                                    fontSize: '0.68rem', fontWeight: 700,
-                                    color: 'var(--text-muted)',
-                                    letterSpacing: '0.08em', textTransform: 'uppercase',
-                                    padding: '0 4px', marginBottom: 6,
-                                }}>
+                            <div key={label} className="mb-5">
+                                <p className="text-[0.62rem] font-bold text-muted-foreground/40 uppercase tracking-widest px-1 mb-2">
                                     {label}
                                 </p>
                                 {convs.map(conv => (
@@ -209,18 +145,13 @@ export default function Sidebar({
                 )}
             </div>
 
-            {/* ── User footer ────────────────────────────────────────── */}
-            <div style={{
-                padding: '14px 16px',
-                borderTop: '1px solid var(--glass-border)',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                gap: 10,
-            }}>
-                <div style={{ overflow: 'hidden' }}>
-                    <p style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {/* ── User footer ─────────────────────────────────── */}
+            <div className="px-4 py-3.5 border-t border-border flex items-center justify-between gap-3">
+                <div className="overflow-hidden">
+                    <p className="text-[0.82rem] font-semibold text-foreground truncate">
                         {username ?? user?.email?.split('@')[0]}
                     </p>
-                    <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <p className="text-[0.67rem] text-muted-foreground/60 truncate">
                         {user?.email}
                     </p>
                 </div>
@@ -228,14 +159,12 @@ export default function Sidebar({
                     id="btn-sign-out"
                     onClick={handleSignOut}
                     title="Sign out"
-                    style={{
-                        background: 'transparent', border: '1px solid var(--glass-border)',
-                        color: 'var(--text-muted)', borderRadius: 8,
-                        padding: '6px 10px', cursor: 'pointer', fontSize: '0.8rem',
-                        flexShrink: 0, transition: 'all 0.2s ease',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#f43f5e'; e.currentTarget.style.borderColor = 'rgba(244,63,94,0.3)' }}
-                    onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--glass-border)' }}
+                    className="
+                        shrink-0 px-2.5 py-1.5 rounded-lg text-[0.75rem]
+                        text-muted-foreground border border-border
+                        hover:text-destructive hover:border-destructive/30 hover:bg-destructive/5
+                        transition-all duration-200
+                    "
                 >
                     ⏻
                 </button>

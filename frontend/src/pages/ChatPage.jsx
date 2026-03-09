@@ -14,7 +14,6 @@ export default function ChatPage() {
     const [username, setUsername] = useState(null)
     const [profileLoading, setProfileLoading] = useState(true)
 
-    /* ── Fetch profile on mount ─────────────────────────────── */
     useEffect(() => {
         if (user) fetchProfile()
     }, [user])
@@ -30,30 +29,19 @@ export default function ChatPage() {
         setProfileLoading(false)
     }
 
-    const handleUsernameSet = (name) => {
-        setUsername(name)
-    }
-
+    const handleUsernameSet = (name) => setUsername(name)
     const handleNewChat = () => setActiveConvId(null)
 
-    /* Show loader while we check if profile exists */
     if (profileLoading) {
         return <OceanLoader message="Loading your research space…" />
     }
 
     return (
-        <div style={{
-            display: 'flex', height: '100vh',
-            background: 'var(--bg-root)',
-            fontFamily: 'var(--font-sans)',
-            overflow: 'hidden',
-        }}>
-            {/* Username popup — shown once after first login */}
-            {!username && (
-                <UsernameModal onComplete={handleUsernameSet} />
-            )}
+        /* Chat layout: full viewport, no scroll — managed per-pane */
+        <div className="flex h-screen w-screen overflow-hidden bg-background font-sans">
 
-            {/* ── Sidebar ──────────────────────────────────────── */}
+            {!username && <UsernameModal onComplete={handleUsernameSet} />}
+
             <Sidebar
                 username={username}
                 conversations={conversations}
@@ -63,7 +51,6 @@ export default function ChatPage() {
                 onNewChat={handleNewChat}
             />
 
-            {/* ── Chat area ────────────────────────────────────── */}
             <ChatWindow
                 conversationId={activeConvId}
                 setConversationId={setActiveConvId}
