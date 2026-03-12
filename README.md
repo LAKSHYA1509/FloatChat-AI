@@ -28,6 +28,8 @@ Create a `.env` file in the project root:
 # ── Core (Required) ────────────────────────────────────────────
 DATABASE_URL=postgresql://user:password@host:port/dbname
 GOOGLE_API_KEY=your_google_gemini_api_key
+GROQ_API_KEY=your_groq_key          # Alternative LLM provider
+OPENROUTER_API_KEY=your_key          # Alternative LLM provider
 
 # ── Supabase Auth (Required for frontend) ──────────────────────
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -39,9 +41,6 @@ FLOATCHAT_CONTRACT_ADDRESS=your_contract_address
 BLOCKCHAIN_WALLET_ADDRESS=your_wallet_address
 BLOCKCHAIN_PRIVATE_KEY=your_private_key
 
-# ── Optional ──────────────────────────────────────────────────
-GROQ_API_KEY=your_groq_key          # Alternative LLM provider
-OPENROUTER_API_KEY=your_key          # Alternative LLM provider
 REDIS_URL=redis://localhost:6379     # For rate limiting
 ```
 
@@ -49,12 +48,15 @@ REDIS_URL=redis://localhost:6379     # For rate limiting
 
 ```bash
 # Backend setup
-python -m venv venv && venv\Scripts\activate   # Windows
+python -m venv venv
+.venv\Scripts\activate   # Windows
 # source venv/bin/activate                      # macOS/Linux
 pip install -r requirements.txt
 
 # Frontend setup
-cd frontend && npm install && cd ..
+cd frontend
+npm install
+cd ..
 
 # Run (two terminals)
 python -m uvicorn api.main:app --reload --port 8000   # Terminal 1
