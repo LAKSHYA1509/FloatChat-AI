@@ -49,7 +49,7 @@ REDIS_URL=redis://localhost:6379     # For rate limiting
 ```bash
 # Backend setup
 python -m venv venv
-.venv\Scripts\activate   # Windows
+venv\Scripts\activate   # Windows
 # source venv/bin/activate                      # macOS/Linux
 pip install -r requirements.txt
 
